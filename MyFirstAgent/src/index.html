@@ -1,26 +1,115 @@
 <!DOCTYPE html>
-<html lang="cn">
-<head>
+<html>
+  <head>
     <title>我的第一个网页</title>
-</head>
-<body>
-    <h1>欢迎来到我的网页</h1>
-    <p>这是我的第一个网页。</p>
+    <style>
+      /* ===== 页面整体样式 ===== */
+      body {
+        font-family: "Microsoft YaHei", sans-serif;  /* 字体：微软雅黑 */
+        background-color: #f3fff4;                    /* 背景色：浅灰 */
+        color: #333;                                  /* 文字颜色：深灰 */
+        line-height: 1.8;                             /* 行间距 */
+        margin: 0;                                    /* 去掉默认外边距 */
+        padding: 0;                                   /* 去掉默认内边距 */
+      }
 
-    <h2>我的学习计划</h2>
-    <ul>
+      /* ===== 内容容器：让内容居中，不会撑满整个屏幕 ===== */
+      .container {
+        max-width: 500px;          /* 最大宽度 800 像素 */
+        margin: 0 auto;            /* 上下0，左右自动 = 水平居中 */
+        padding: 40px 20px;        /* 上下40，左右20 的内边距 */
+      }
+
+      /* ===== 大标题样式 ===== */
+      h1 {
+        color: #1a73e8;            /* 蓝色 */
+        text-align: center;        /* 居中 */
+        font-size: 32px;           /* 字号 */
+        margin-bottom: 10px;       /* 下方留点间距 */
+      }
+
+      /* ===== 副标题样式 ===== */
+      h2 {
+        color: #333;
+        font-size: 22px;
+        border-bottom: 2px solid #1a73e8;   /* 底部加一条蓝色线 */
+        padding-bottom: 8px;                 /* 文字和线之间留点距离 */
+        margin-top: 30px;                    /* 上方留间距 */
+      }
+
+      /* ===== 段落样式 ===== */
+      p {
+        font-size: 16px;
+        margin: 10px 0;
+      }
+
+      /* ===== 介绍文字：居中显示的灰色小字 ===== */
+      .intro {
+        text-align: center;
+        color: #666;
+        font-size: 14px;
+        margin-bottom: 30px;
+      }
+
+      /* ===== 列表样式 ===== */
+      ul {
+        background-color: #fff;             /* 白色背景 */
+        border-radius: 8px;                 /* 圆角 */
+        padding: 20px 20px 20px 40px;       /* 内边距 */
+        border: 1px solid #e0e0e0;          /* 浅灰边框 */
+      }
+
+      li {
+        margin: 8px 0;              /* 每个列表项之间的间距 */
+        font-size: 16px;
+      }
+
+      /* ===== 链接样式 ===== */
+      a {
+        color: #1a73e8;
+        text-decoration: none;       /* 去掉下划线 */
+      }
+
+      a:hover {
+        text-decoration: underline;  /* 鼠标悬停时显示下划线 */
+      }
+
+      /* ===== 按钮样式 ===== */
+      button {
+        background-color: #1a73e8;   /* 蓝色背景 */
+        color: #fff;                 /* 白色文字 */
+        border: none;                /* 去掉边框 */
+        padding: 10px 24px;          /* 内边距 */
+        font-size: 16px;
+        border-radius: 30px;          /* 圆角 */
+        cursor: pointer;             /* 鼠标变成手指形状 */
+        margin-top: 20px;
+      }
+
+      button:hover {
+        background-color: #1557b0;   /* 悬停时颜色变深 */
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>你好，世界！</h1>
+      <p class="intro">这是我学编程写的第一个网页 —— Day 4 加上了样式</p>
+
+      <h2>我的学习计划</h2>
+      <ul>
         <li>第1周：环境搭建 + 基础认知</li>
         <li>第2周：JavaScript 基础</li>
         <li>第3周：实战代码阅读</li>
         <li>第4周：AI + Review 实战</li>
-    </ul>
+      </ul>
 
-    <h2>我的目标</h2>
-    <p>能看懂和审查 AI 写的代码，成为 AI 编程的好指挥官。</p> 
+      <h2>我的目标</h2>
+      <p>能看懂和审查 AI 写的代码，成为 AI 编程的好指挥官。</p>
 
-    <a href="https://code.visualstudio.com/">VS Code 官网</a>
-    <br>
-    <button>这是一个按钮</button>
-
-</body>
+      <a href="https://code.visualstudio.com/">访问 VS Code 官网</a>
+      <br>
+      <button>这是一个按钮</button>
+    </div>
+  </body>
 </html>
