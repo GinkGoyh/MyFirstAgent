@@ -1,3 +1,31 @@
+// 中国节假日数据（2026年）
+const holidays = [
+    { name: "元旦", date: "2026-01-01" },
+    { name: "春节", date: "2026-01-29" },
+    { name: "清明节", date: "2026-04-05" },
+    { name: "劳动节", date: "2026-05-01" },
+    { name: "端午节", date: "2026-06-19" },
+    { name: "中秋节", date: "2026-09-25" },
+    { name: "国庆节", date: "2026-10-01" }
+];
+
+const quoteEl = document.getElementById("quote");
+const today = new Date();
+
+let nextHoliday = null;
+for (let i = 0; i < holidays.length; i++) {
+    if (new Date(holidays[i].date) >= today) {
+        nextHoliday = holidays[i];
+        break;
+    }
+}
+
+if (nextHoliday !== null) {
+    const days = Math.ceil((new Date(nextHoliday.date) - today) / (1000 * 60 * 60 * 24));
+    quoteEl.textContent = "下一个假期：" + nextHoliday.name + "（" + nextHoliday.date + "）还有 " + days + " 天";
+} else {
+    quoteEl.textContent = "今年的假期都过完啦！";
+}
       // ==========================================
       // 待办清单功能
       // 用数组存储数据，用循环渲染页面
@@ -27,6 +55,7 @@
       const renderTodos = () => {
         // 先清空列表，防止重复显示
         todoList.innerHTML = "";
+       
 
         // 如果数组为空，显示提示
         if (todos.length === 0) {
