@@ -33,13 +33,21 @@ if (nextHoliday !== null) {
 
       // 用数组存储所有待办事项
       // 每个待办是一个"对象"，包含文字内容和是否完成
-      let todos = [
+        // 从浏览器本地存储读取待办数据，如果没有就用默认数据
+    const saved = localStorage.getItem("todos");
+
+    let todos;
+    if (saved !== null) {
+        todos = JSON.parse(saved);
+    } else {
+    todos = [
         { text: "学习 HTML 基础", done: true },
         { text: "学习 CSS 样式", done: true },
         { text: "学习 JavaScript 基础", done: true },
         { text: "学习数组和循环", done: false },
         { text: "学习读代码和 Review", done: false }
-      ];
+    ];
+    }
 
       // 找到页面上的元素
       const todoInput = document.getElementById("todoInput");
@@ -53,8 +61,10 @@ if (nextHoliday !== null) {
       // 每次数据变化后都要调用这个函数来刷新页面
       // ------------------------------------------
       const renderTodos = () => {
+        localStorage.setItem("todos", JSON.stringify(todos));    // 把最新的待办数据保存到浏览器本地存储
         // 先清空列表，防止重复显示
         todoList.innerHTML = "";
+        
        
 
         // 如果数组为空，显示提示
