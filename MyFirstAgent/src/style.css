@@ -1,0 +1,127 @@
+ body {
+        font-family: "Microsoft YaHei", sans-serif;
+        background-color: #f5f5f5;
+        color: #333;
+        line-height: 1.8;
+        margin: 0;
+        padding: 0;
+      }
+
+.container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 40px 20px;
+      }
+
+h1 {
+        color: #1a73e8;
+        text-align: center;
+        font-size: 32px;
+        margin-bottom: 10px;
+      }
+
+h2 {
+        color: #333;
+        font-size: 22px;
+        border-bottom: 2px solid #1a73e8;
+        padding-bottom: 8px;
+        margin-top: 30px;
+      }
+
+.intro {
+        text-align: center;
+        color: #666;
+        font-size: 14px;
+        margin-bottom: 30px;
+      }
+
+input {
+        padding: 8px 12px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        margin-right: 10px;
+        width: 300px;
+      }
+
+button {
+        background-color: #1a73e8;
+        color: #fff;
+        border: none;
+        padding: 10px 24px;
+        font-size: 16px;
+        border-radius: 6px;
+        cursor: pointer;
+        margin-top: 10px;
+      }
+
+button:hover {
+        background-color: #1557b0;
+      }
+
+      /* ===== 待办清单样式 ===== */
+
+      /* 整个清单列表 */
+      .todo-list {
+        list-style: none;          /* 去掉默认的圆点 */
+        padding: 0;
+        margin-top: 20px;
+      }
+
+      /* 每一条待办项 */
+.todo-item {
+        background-color: #fff;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 12px 16px;
+        margin-bottom: 10px;
+        display: flex;              /* 弹性布局：让内容和按钮左右排列 */
+        justify-content: space-between;  /* 两端对齐 */
+        align-items: center;        /* 垂直居中 */
+      }
+
+      /* 已完成的待办项：加删除线、变灰 */
+.todo-done {
+        text-decoration: line-through;   /* 文字加删除线 */
+        color: #999;                     /* 变灰色 */
+      }
+
+      /* 删除按钮：红色小按钮 */
+.delete-btn {
+        background-color: #e53935;
+        padding: 5px 12px;
+        font-size: 13px;
+        margin: 0;
+      }
+
+.delete-btn:hover {
+        background-color: #c62828;
+      }
+
+      /* 完成按钮：绿色小按钮 */
+.done-btn {
+        background-color: #43a047;
+        padding: 5px 12px;
+        font-size: 13px;
+        margin: 0;
+        margin-right: 8px;
+      }
+
+.done-btn:hover {
+        background-color: #2e7d32;
+      }
+
+      /* 统计信息 */
+.stats {
+        color: #666;
+        font-size: 14px;
+        margin-top: 15px;
+      }
+
+      /* 空状态提示 */
+.empty-tip {
+        color: #999;
+        text-align: center;
+        padding: 30px;
+        font-size: 15px;
+      }
