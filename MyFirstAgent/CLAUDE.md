@@ -42,3 +42,28 @@
 <!-- 格式：日期 | 错误描述 | 正确做法 -->
 
 （暂无，后续使用中逐步积累）
+
+# 技术栈说明（Day 7 更新）
+
+本项目使用以下技术：
+- HTML：页面结构
+- CSS：页面样式（目前写在 HTML 的 <style> 标签内）
+- JavaScript：交互逻辑（目前写在 HTML 的 <script> 标签内）
+
+# CSS 代码规范
+
+- 颜色统一使用十六进制写法（如 #1a73e8），不要用英文单词（如 blue）
+- 关键样式块上方必须写注释说明用途
+- 优先使用 classList 切换样式，减少直接操作 style
+
+# JavaScript 代码规范
+
+- 判断相等必须用 ===，判断不等必须用 !==，禁止使用 == 和 !=
+- 禁止使用 var，只使用 let 和 const
+- 数组操作使用 push/splice 等内置方法，不要手动拼接
+- 事件监听统一使用 addEventListener，不要用 onclick
+
+# 常见错误记录（持续更新）
+
+- 2026-03-25 | PowerShell 中文乱码 | 执行 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+- 2026-03-25 | cd Desktop 找不到路径 | Windows 桌面路径要用 cd ~\Desktop 或直接用绝对路径
