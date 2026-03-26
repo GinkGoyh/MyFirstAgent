@@ -24,7 +24,7 @@
       // 渲染函数：把数组里的数据显示到页面上
       // 每次数据变化后都要调用这个函数来刷新页面
       // ------------------------------------------
-      function renderTodos() {
+      const renderTodos = () => {
         // 先清空列表，防止重复显示
         todoList.innerHTML = "";
 
@@ -58,7 +58,7 @@
           const doneBtn = document.createElement("button");
           doneBtn.textContent = todos[i].done ? "撤销" : "完成";
           doneBtn.className = "done-btn";
-          doneBtn.addEventListener("click", function() {
+          doneBtn.addEventListener("click", () => {
             // 切换完成状态：true 变 false，false 变 true
             todos[i].done = !todos[i].done;
             renderTodos();    // 重新渲染页面
@@ -68,7 +68,7 @@
           const deleteBtn = document.createElement("button");
           deleteBtn.textContent = "删除";
           deleteBtn.className = "delete-btn";
-          deleteBtn.addEventListener("click", function() {
+          deleteBtn.addEventListener("click", () => {
             // 从数组中删除第 i 个元素
             // splice(从哪个位置开始, 删几个)
             todos.splice(i, 1);
@@ -101,7 +101,7 @@
       // ------------------------------------------
       // 添加功能：点击按钮，把输入框的内容加到数组里
       // ------------------------------------------
-      addBtn.addEventListener("click", function() {
+      addBtn.addEventListener("click", () => {
         let newText = todoInput.value;
 
         // 如果输入框为空，不添加
@@ -123,7 +123,7 @@
       // ------------------------------------------
       // 按回车也能添加（不用每次都点按钮）
       // ------------------------------------------
-      todoInput.addEventListener("keydown", function(event) {
+      todoInput.addEventListener("keydown", (event) => {
         // event.key 是用户按下的键的名称
         if (event.key === "Enter") {
           addBtn.click();    // 模拟点击添加按钮
