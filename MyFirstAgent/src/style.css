@@ -59,6 +59,15 @@ button:hover {
         background-color: #1557b0;
       }
 
+      /* 搜索框：和输入框风格一致，宽度更大，独占一行 */
+#searchInput {
+    width: 100%;
+    max-width: 500px;
+    display: block;
+    margin-bottom: 16px;
+    box-sizing: border-box;
+}
+
       /* 清空已完成按钮：橙色，与添加按钮区分 */
 .clear-done-btn {
         background-color: #f57c00;

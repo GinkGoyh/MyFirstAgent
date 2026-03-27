@@ -52,10 +52,14 @@ if (saved !== null) {
 
 // 找到页面上的元素
 const todoInput = document.getElementById("todoInput");
+const searchInput = document.getElementById("searchInput");
 const addBtn = document.getElementById("addBtn");
 const clearDoneBtn = document.getElementById("clearDoneBtn");
 const todoList = document.getElementById("todoList");
 const stats = document.getElementById("stats");
+
+// 当前搜索关键词，空字符串表示不过滤
+let searchKeyword = "";
 
 
 // ------------------------------------------
@@ -74,19 +78,33 @@ const renderTodos = () => {
         return;    // return 表示"到此结束，下面的代码不执行了"
     }
 
-    // 用 for 循环遍历数组，每个待办生成一个列表项
-    for (let i = 0; i < todos.length; i++) {
+    // 根据搜索关键词过滤，只显示包含关键词的项（不修改原数组）
+    const visibleTodos = todos.filter((item) => item.text.includes(searchKeyword));
+
+    // 过滤后没有匹配项，显示提示
+    if (visibleTodos.length === 0) {
+        todoList.innerHTML = '<li class="empty-tip">没有找到匹配的待办事项</li>';
+        stats.textContent = "";
+        return;
+    }
+
+    // 用 for 循环遍历过滤后的数组，每个待办生成一个列表项
+    for (let i = 0; i < visibleTodos.length; i++) {
 
         // 创建一个新的 <li> 元素
         const li = document.createElement("li");
         li.className = "todo-item";
 
+        // 取出当前这条待办，以及它在原数组中的真实位置
+        const currentTodo = visibleTodos[i];
+        const realIndex = todos.indexOf(currentTodo);
+
         // 创建文字部分
         const textSpan = document.createElement("span");
-        textSpan.textContent = todos[i].text;
+        textSpan.textContent = currentTodo.text;
 
         // 如果已完成，加上删除线样式
-        if (todos[i].done === true) {
+        if (currentTodo.done === true) {
             textSpan.classList.add("todo-done");
         }
 
@@ -95,11 +113,11 @@ const renderTodos = () => {
 
         // 创建"完成"按钮
         const doneBtn = document.createElement("button");
-        doneBtn.textContent = todos[i].done ? "撤销" : "完成";
+        doneBtn.textContent = currentTodo.done ? "撤销" : "完成";
         doneBtn.className = "done-btn";
         doneBtn.addEventListener("click", () => {
             // 切换完成状态：true 变 false，false 变 true
-            todos[i].done = !todos[i].done;
+            todos[realIndex].done = !todos[realIndex].done;
             renderTodos();    // 重新渲染页面
         });
 
@@ -108,9 +126,9 @@ const renderTodos = () => {
         deleteBtn.textContent = "删除";
         deleteBtn.className = "delete-btn";
         deleteBtn.addEventListener("click", () => {
-            // 从数组中删除第 i 个元素
+            // 从原数组中删除这条待办
             // splice(从哪个位置开始, 删几个)
-            todos.splice(i, 1);
+            todos.splice(realIndex, 1);
             renderTodos();    // 重新渲染页面
         });
 
@@ -167,6 +185,15 @@ todoInput.addEventListener("keydown", (event) => {
     if (event.key === "Enter") {
         addBtn.click();    // 模拟点击添加按钮
     }
+});
+
+
+// ------------------------------------------
+// 搜索功能：每次输入都更新关键词并重新渲染
+// ------------------------------------------
+searchInput.addEventListener("input", () => {
+    searchKeyword = searchInput.value;
+    renderTodos();
 });
 
 
