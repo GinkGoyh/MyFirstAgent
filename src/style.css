@@ -1,0 +1,235 @@
+ body {
+        font-family: "Microsoft YaHei", sans-serif;
+        background-color: #f5f5f5;
+        color: #333;
+        line-height: 1.8;
+        margin: 0;
+        padding: 0;
+      }
+
+.container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 40px 20px;
+      }
+
+h1 {
+        color: #1a73e8;
+        text-align: center;
+        font-size: 32px;
+        margin-bottom: 10px;
+      }
+
+h2 {
+        color: #333;
+        font-size: 22px;
+        border-bottom: 2px solid #1a73e8;
+        padding-bottom: 8px;
+        margin-top: 30px;
+      }
+
+.intro {
+        text-align: center;
+        color: #666;
+        font-size: 14px;
+        margin-bottom: 30px;
+      }
+
+input {
+        padding: 8px 12px;
+        font-size: 16px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        margin-right: 10px;
+        width: 300px;
+      }
+
+button {
+        background-color: #1a73e8;
+        color: #fff;
+        border: none;
+        padding: 10px 24px;
+        font-size: 16px;
+        border-radius: 6px;
+        cursor: pointer;
+        margin-top: 10px;
+      }
+
+button:hover {
+        background-color: #1557b0;
+      }
+
+      /* 搜索框：和输入框风格一致，宽度更大，独占一行 */
+#searchInput {
+    width: 100%;
+    max-width: 500px;
+    display: block;
+    margin-bottom: 16px;
+    box-sizing: border-box;
+}
+
+      /* 清空已完成按钮：橙色，与添加按钮区分 */
+.clear-done-btn {
+        background-color: #f57c00;
+        margin-left: 10px;
+      }
+
+.clear-done-btn:hover {
+        background-color: #e65100;
+      }
+
+      /* ===== 待办清单样式 ===== */
+
+      /* 整个清单列表 */
+      .todo-list {
+        list-style: none;          /* 去掉默认的圆点 */
+        padding: 0;
+        margin-top: 20px;
+      }
+
+      /* 每一条待办项 */
+.todo-item {
+        background-color: #fff;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 12px 16px;
+        margin-bottom: 10px;
+        display: flex;              /* 弹性布局：让内容和按钮左右排列 */
+        justify-content: space-between;  /* 两端对齐 */
+        align-items: center;        /* 垂直居中 */
+      }
+
+      /* 已完成的待办项：加删除线、变灰 */
+.todo-done {
+        text-decoration: line-through;   /* 文字加删除线 */
+        color: #999;                     /* 变灰色 */
+      }
+
+      /* 删除按钮：红色小按钮 */
+.delete-btn {
+        background-color: #e53935;
+        padding: 5px 12px;
+        font-size: 13px;
+        margin: 0;
+      }
+
+.delete-btn:hover {
+        background-color: #c62828;
+      }
+
+      /* 完成按钮：绿色小按钮 */
+.done-btn {
+        background-color: #43a047;
+        padding: 5px 12px;
+        font-size: 13px;
+        margin: 0;
+        margin-right: 8px;
+      }
+
+.done-btn:hover {
+        background-color: #2e7d32;
+      }
+
+      /* 统计信息 */
+.stats {
+        color: #666;
+        font-size: 14px;
+        margin-top: 15px;
+      }
+
+      /* 空状态提示 */
+.empty-tip {
+        color: #999;
+        text-align: center;
+        padding: 30px;
+        font-size: 15px;
+      }
+/* ===== 暗黑模式切换按钮：固定在右上角 ===== */
+.theme-toggle-btn {
+    position: fixed;
+    top: 16px;
+    right: 20px;
+    background-color: #f0f0f0;
+    color: #333;
+    border: 1px solid #ccc;
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    font-size: 20px;
+    padding: 0;
+    cursor: pointer;
+    z-index: 999;
+    margin: 0;
+}
+
+.theme-toggle-btn:hover {
+    background-color: #e0e0e0;
+}
+
+/* ===== 暗黑模式：body 加上 dark 类后，下面所有样式生效 ===== */
+body.dark {
+    background-color: #1a1a2e;
+    color: #e0e0e0;
+}
+
+body.dark h1 {
+    color: #90caf9;
+}
+
+body.dark h2 {
+    color: #e0e0e0;
+    border-bottom-color: #90caf9;
+}
+
+body.dark .intro {
+    color: #aaa;
+}
+
+/* 暗黑模式下输入框 */
+body.dark input {
+    background-color: #2a2a3e;
+    color: #e0e0e0;
+    border-color: #555;
+}
+
+/* 暗黑模式下每条待办项 */
+body.dark .todo-item {
+    background-color: #2a2a3e;
+    border-color: #444;
+}
+
+/* 暗黑模式下已完成文字 */
+body.dark .todo-done {
+    color: #777;
+}
+
+/* 暗黑模式下统计和空提示文字 */
+body.dark .stats,
+body.dark .empty-tip {
+    color: #aaa;
+}
+
+/* 暗黑模式下引用名言 */
+body.dark .quote {
+    color: #aaa;
+    border-left-color: #66bb6a;
+}
+
+/* 暗黑模式下切换按钮本身 */
+body.dark .theme-toggle-btn {
+    background-color: #2a2a3e;
+    color: #e0e0e0;
+    border-color: #555;
+}
+
+body.dark .theme-toggle-btn:hover {
+    background-color: #3a3a5e;
+}
+
+.quote {
+    color: #666666;
+    font-style: italic;
+    border-left: 3px solid #4CAF50;
+    padding-left: 10px;
+    margin: 10px 0 20px 0;
+}
