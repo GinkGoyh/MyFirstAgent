@@ -59,6 +59,16 @@ button:hover {
         background-color: #1557b0;
       }
 
+      /* 清空已完成按钮：橙色，与添加按钮区分 */
+.clear-done-btn {
+        background-color: #f57c00;
+        margin-left: 10px;
+      }
+
+.clear-done-btn:hover {
+        background-color: #e65100;
+      }
+
       /* ===== 待办清单样式 ===== */
 
       /* 整个清单列表 */
