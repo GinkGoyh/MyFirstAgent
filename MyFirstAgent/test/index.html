@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>待办清单 - 自动测试</title>
+    <style>
+        /* 测试结果页面样式 */
+        body {
+            font-family: "Microsoft YaHei", sans-serif;
+            padding: 24px;
+            background: #f0f2f5;
+            margin: 0;
+        }
+
+        h1 { color: #333; margin-bottom: 4px; }
+
+        .subtitle {
+            color: #888;
+            font-size: 0.9em;
+            margin-bottom: 20px;
+        }
+
+        /* 汇总条 */
+        .summary {
+            font-size: 1.1em;
+            font-weight: bold;
+            padding: 14px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .summary.all-pass { background: #c8e6c9; color: #1b5e20; }
+        .summary.has-fail { background: #ffcdd2; color: #b71c1c; }
+
+        /* 每组测试套件 */
+        .suite {
+            background: #fff;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+        }
+
+        .suite h3 {
+            margin: 0 0 12px 0;
+            font-size: 1em;
+            color: #555;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 8px;
+        }
+
+        /* 单条测试结果 */
+        .test-case {
+            padding: 7px 10px;
+            margin: 4px 0;
+            border-radius: 4px;
+            font-size: 0.95em;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .test-case.pass { background: #f1f8f1; color: #2e7d32; }
+        .test-case.fail { background: #fff3f3; color: #c62828; }
+
+        .test-case .error-msg {
+            font-size: 0.85em;
+            opacity: 0.8;
+            margin-left: 20px;
+        }
+
+        /* 隐藏的 app DOM（app.js 需要这些元素才能运行） */
+        #app-container { display: none; }
+    </style>
+</head>
+<body>
+    <h1>待办清单 - 自动测试</h1>
+    <p class="subtitle">在浏览器中直接打开此文件即可运行全部测试</p>
+
+    <!-- ============================================================
+         隐藏的 app DOM 结构，必须与 src/index.html 中的元素保持一致
+         app.js 加载时会通过 getElementById 找到这些元素
+    ============================================================ -->
+    <div id="app-container">
+        <p id="quote"></p>
+        <input id="searchInput" type="text">
+        <input id="todoInput" type="text">
+        <button id="addBtn">添加</button>
+        <button id="clearDoneBtn">清空已完成</button>
+        <p id="stats"></p>
+        <ul id="todoList"></ul>
+    </div>
+
+    <!-- 加载 app.js：它会立即执行并把事件绑到上面的 DOM 上 -->
+    <script src="../src/app.js"></script>
+
+    <!-- ============================================================
+         测试脚本
+         说明：app.js 以普通 <script> 标签加载，所有顶层变量
+         （todos、renderTodos、searchKeyword 等）都在全局作用域中，
+         这里可以直接读写它们。
+    ============================================================ -->
+    <script>
+        // ==========================================
+        // 简易测试框架
+        // ==========================================
+
+        // 存储所有测试结果
+        const allSuites = [];
+
+        /**
+         * 定义一组测试（套件）
+         * @param {string} suiteName - 套件名称（显示在页面上）
+         * @param {Array}  cases     - 二维数组：[[用例名, 函数], ...]
+         */
+        function describe(suiteName, cases) {
+            const results = [];
+            for (const [caseName, fn] of cases) {
+                try {
+                    fn();
+                    results.push({ name: caseName, pass: true });
+                } catch (e) {
+                    results.push({ name: caseName, pass: false, error: e.message });
+                }
+            }
+            allSuites.push({ suiteName, results });
+        }
+
+        /**
+         * 断言：condition 为 false 时抛出错误
+         */
+        function assert(condition, message) {
+            if (!condition) {
+                throw new Error(message || "断言失败");
+            }
+        }
+
+        /**
+         * 断言相等：actual !== expected 时抛出错误
+         */
+        function assertEqual(actual, expected, message) {
+            if (actual !== expected) {
+                throw new Error(
+                    (message || "值不匹配") +
+                    "（期望: " + JSON.stringify(expected) +
+                    "，实际: " + JSON.stringify(actual) + "）"
+                );
+            }
+        }
+
+        // ==========================================
+        // 测试辅助函数
+        // ==========================================
+
+        /**
+         * 重置 todos 数组为指定数据，并重新渲染页面
+         * 每个测试用例开始前调用，保证测试互不干扰
+         */
+        function resetState(initialData) {
+            // splice(0, 全部删掉, 再插入新数据) —— 原地修改数组，不重新赋值
+            todos.splice(0, todos.length, ...initialData);
+            // 重置搜索状态
+            searchInput.value = "";
+            searchKeyword = "";
+            renderTodos();
+        }
+
+        /**
+         * 通过 UI 操作触发"添加待办"（模拟用户点击按钮）
+         */
+        function triggerAdd(text) {
+            todoInput.value = text;
+            addBtn.click();
+        }
+
+        /**
+         * 通过 UI 操作触发"搜索"（模拟用户输入搜索词）
+         */
+        function triggerSearch(keyword) {
+            searchInput.value = keyword;
+            // dispatchEvent 模拟浏览器的 input 事件
+            searchInput.dispatchEvent(new Event("input"));
+        }
+
+        /**
+         * 获取页面列表中当前显示的所有待办文字（数组）
+         */
+        function getListTexts() {
+            return Array.from(
+                todoList.querySelectorAll(".todo-item span:first-child")
+            ).map(el => el.textContent);
+        }
+
+        /**
+         * 获取第 index 项（从 0 开始）的"完成/撤销"按钮
+         */
+        function getDoneBtn(index) {
+            return todoList.querySelectorAll(".done-btn")[index];
+        }
+
+        /**
+         * 获取第 index 项（从 0 开始）的"删除"按钮
+         */
+        function getDeleteBtn(index) {
+            return todoList.querySelectorAll(".delete-btn")[index];
+        }
+
+        // ==========================================
+        // 测试套件 1：添加待办
+        // ==========================================
+        describe("1. 添加待办", [
+            ["添加一条新待办，todos 数组增加一项", () => {
+                resetState([]);
+                triggerAdd("买牛奶");
+                assertEqual(todos.length, 1, "todos 数组长度");
+                assertEqual(todos[0].text, "买牛奶", "待办文字");
+                assertEqual(todos[0].done, false, "新建待办默认未完成");
+            }],
+
+            ["输入框为空时点击添加，不增加任何内容", () => {
+                resetState([]);
+                triggerAdd("");
+                assertEqual(todos.length, 0, "空输入不应添加");
+            }],
+
+            ["添加成功后输入框被自动清空", () => {
+                resetState([]);
+                triggerAdd("学习测试");
+                assertEqual(todoInput.value, "", "输入框应被清空");
+            }],
+
+            ["添加后页面列表正确渲染新待办", () => {
+                resetState([]);
+                triggerAdd("完成作业");
+                const texts = getListTexts();
+                assert(texts.includes("完成作业"), "页面应显示新待办");
+            }],
+
+            ["可以连续添加多条待办", () => {
+                resetState([]);
+                triggerAdd("任务A");
+                triggerAdd("任务B");
+                triggerAdd("任务C");
+                assertEqual(todos.length, 3, "应有 3 条待办");
+            }],
+        ]);
+
+        // ==========================================
+        // 测试套件 2：删除待办
+        // ==========================================
+        describe("2. 删除待办", [
+            ["点击删除按钮，该条待办从数组中移除", () => {
+                resetState([
+                    { text: "待删除项", done: false },
+                    { text: "保留项", done: false },
+                ]);
+                getDeleteBtn(0).click();
+                assertEqual(todos.length, 1, "删除后剩 1 项");
+                assertEqual(todos[0].text, "保留项", "保留项仍在");
+            }],
+
+            ["删除后页面不再显示被删除的待办", () => {
+                resetState([
+                    { text: "项目A", done: false },
+                    { text: "项目B", done: false },
+                ]);
+                getDeleteBtn(0).click();
+                const texts = getListTexts();
+                assert(!texts.includes("项目A"), "项目A 应已消失");
+                assert(texts.includes("项目B"), "项目B 应仍显示");
+            }],
+
+            ["删除列表中最后一项，显示空列表提示", () => {
+                resetState([{ text: "唯一一项", done: false }]);
+                getDeleteBtn(0).click();
+                const emptyTip = todoList.querySelector(".empty-tip");
+                assert(emptyTip !== null, "应显示空列表提示");
+            }],
+        ]);
+
+        // ==========================================
+        // 测试套件 3：标记完成/未完成
+        // ==========================================
+        describe("3. 标记完成 / 未完成", [
+            ["点击'完成'按钮，done 变为 true", () => {
+                resetState([{ text: "待完成", done: false }]);
+                getDoneBtn(0).click();
+                assertEqual(todos[0].done, true, "done 应变为 true");
+            }],
+
+            ["点击'撤销'按钮，done 变回 false", () => {
+                resetState([{ text: "已完成项", done: true }]);
+                getDoneBtn(0).click();
+                assertEqual(todos[0].done, false, "done 应变回 false");
+            }],
+
+            ["未完成项的按钮显示'完成'，已完成项显示'撤销'", () => {
+                resetState([
+                    { text: "未完成", done: false },
+                    { text: "已完成", done: true },
+                ]);
+                assertEqual(getDoneBtn(0).textContent, "完成", "未完成项按钮文字");
+                assertEqual(getDoneBtn(1).textContent, "撤销", "已完成项按钮文字");
+            }],
+
+            ["多次切换状态结果正确", () => {
+                resetState([{ text: "反复切换", done: false }]);
+                getDoneBtn(0).click(); // → true
+                getDoneBtn(0).click(); // → false
+                getDoneBtn(0).click(); // → true
+                assertEqual(todos[0].done, true, "三次切换后应为 true");
+            }],
+        ]);
+
+        // ==========================================
+        // 测试套件 4：清空已完成
+        // ==========================================
+        describe("4. 清空已完成", [
+            ["点击清空已完成，所有 done=true 的项被删除", () => {
+                resetState([
+                    { text: "未完成A", done: false },
+                    { text: "已完成B", done: true },
+                    { text: "已完成C", done: true },
+                ]);
+                clearDoneBtn.click();
+                assertEqual(todos.length, 1, "应只剩 1 项");
+                assertEqual(todos[0].text, "未完成A", "未完成项仍保留");
+            }],
+
+            ["全部已完成时清空，列表变为空", () => {
+                resetState([
+                    { text: "已完成1", done: true },
+                    { text: "已完成2", done: true },
+                ]);
+                clearDoneBtn.click();
+                assertEqual(todos.length, 0, "应全部清空");
+            }],
+
+            ["全部未完成时点击清空，列表不变", () => {
+                resetState([
+                    { text: "项目1", done: false },
+                    { text: "项目2", done: false },
+                ]);
+                clearDoneBtn.click();
+                assertEqual(todos.length, 2, "全部未完成时列表不变");
+            }],
+
+            ["清空后页面重新渲染，已完成项不再显示", () => {
+                resetState([
+                    { text: "保留项", done: false },
+                    { text: "清除项", done: true },
+                ]);
+                clearDoneBtn.click();
+                const texts = getListTexts();
+                assert(!texts.includes("清除项"), "清除项不应再显示");
+                assert(texts.includes("保留项"), "保留项仍应显示");
+            }],
+        ]);
+
+        // ==========================================
+        // 测试套件 5：搜索功能（含大小写忽略）
+        // ==========================================
+        describe("5. 搜索功能（含大小写忽略）", [
+            ["输入关键词，只显示包含关键词的待办", () => {
+                resetState([
+                    { text: "买苹果", done: false },
+                    { text: "买香蕉", done: false },
+                    { text: "学习JS", done: false },
+                ]);
+                triggerSearch("买");
+                const texts = getListTexts();
+                assertEqual(texts.length, 2, "应显示 2 项");
+                assert(texts.includes("买苹果"), "买苹果应显示");
+                assert(texts.includes("买香蕉"), "买香蕉应显示");
+                assert(!texts.includes("学习JS"), "学习JS 不应显示");
+            }],
+
+            ["搜索忽略大小写：输入小写可匹配含大写的待办", () => {
+                resetState([
+                    { text: "学习 JavaScript", done: false },
+                    { text: "学习 Python", done: false },
+                ]);
+                triggerSearch("javascript"); // 全小写搜索
+                const texts = getListTexts();
+                assertEqual(texts.length, 1, "应找到 1 项");
+                assert(texts.includes("学习 JavaScript"), "应匹配到大写 JavaScript");
+            }],
+
+            ["搜索忽略大小写：输入大写可匹配含小写的待办", () => {
+                resetState([
+                    { text: "learn html", done: false },
+                    { text: "学习CSS", done: false },
+                ]);
+                triggerSearch("HTML"); // 全大写搜索
+                const texts = getListTexts();
+                assertEqual(texts.length, 1, "应找到 1 项");
+                assert(texts.includes("learn html"), "应匹配到小写 html");
+            }],
+
+            ["搜索忽略大小写：混合大小写关键词也能匹配", () => {
+                resetState([
+                    { text: "React is awesome", done: false },
+                ]);
+                triggerSearch("rEaCt"); // 混合大小写
+                const texts = getListTexts();
+                assertEqual(texts.length, 1, "混合大小写也应匹配");
+            }],
+
+            ["搜索无结果时显示提示信息", () => {
+                resetState([{ text: "买苹果", done: false }]);
+                triggerSearch("XXXXXX");
+                const emptyTip = todoList.querySelector(".empty-tip");
+                assert(emptyTip !== null, "应显示空结果提示");
+                assert(
+                    emptyTip.textContent.includes("没有找到"),
+                    "提示文字应包含'没有找到'"
+                );
+            }],
+
+            ["清空搜索词后，恢复显示全部待办", () => {
+                resetState([
+                    { text: "项目A", done: false },
+                    { text: "项目B", done: false },
+                ]);
+                triggerSearch("A");
+                triggerSearch(""); // 清空搜索
+                const texts = getListTexts();
+                assertEqual(texts.length, 2, "清空搜索后应显示全部");
+            }],
+
+            ["搜索不影响底层 todos 数组的数据", () => {
+                resetState([
+                    { text: "苹果", done: false },
+                    { text: "香蕉", done: false },
+                    { text: "葡萄", done: false },
+                ]);
+                triggerSearch("苹果"); // 页面只显示 1 项
+                assertEqual(todos.length, 3, "todos 数组不应被过滤，仍有 3 项");
+            }],
+        ]);
+
+        // ==========================================
+        // 测试套件 6：localStorage 数据持久化
+        // ==========================================
+        describe("6. localStorage 数据持久化", [
+            ["renderTodos 调用后，数据被保存到 localStorage", () => {
+                resetState([{ text: "持久化测试", done: false }]);
+                const saved = JSON.parse(localStorage.getItem("todos"));
+                assert(saved !== null, "localStorage 应有数据");
+                assertEqual(saved.length, 1, "localStorage 应有 1 条");
+                assertEqual(saved[0].text, "持久化测试", "内容应匹配");
+            }],
+
+            ["localStorage 中的数据格式包含 text 和 done 字段", () => {
+                resetState([{ text: "格式验证", done: true }]);
+                const saved = JSON.parse(localStorage.getItem("todos"));
+                assert("text" in saved[0], "应有 text 字段");
+                assert("done" in saved[0], "应有 done 字段");
+                assertEqual(saved[0].done, true, "done 值应正确保存");
+            }],
+
+            ["添加待办后，localStorage 与 todos 数组同步", () => {
+                resetState([{ text: "初始项", done: false }]);
+                triggerAdd("新增项");
+                const saved = JSON.parse(localStorage.getItem("todos"));
+                assertEqual(saved.length, todos.length, "localStorage 与数组长度一致");
+                assertEqual(saved[saved.length - 1].text, "新增项", "新增项已保存");
+            }],
+
+            ["删除待办后，localStorage 同步更新", () => {
+                resetState([
+                    { text: "项目X", done: false },
+                    { text: "项目Y", done: false },
+                ]);
+                getDeleteBtn(0).click();
+                const saved = JSON.parse(localStorage.getItem("todos"));
+                assertEqual(saved.length, 1, "localStorage 应只剩 1 项");
+                assertEqual(saved[0].text, "项目Y", "剩余项内容正确");
+            }],
+
+            ["标记完成后，localStorage 中 done 字段同步更新", () => {
+                resetState([{ text: "待完成项", done: false }]);
+                getDoneBtn(0).click();
+                const saved = JSON.parse(localStorage.getItem("todos"));
+                assertEqual(saved[0].done, true, "localStorage 中 done 应更新为 true");
+            }],
+
+            ["页面加载时若 localStorage 有数据则使用该数据（验证初始化逻辑）", () => {
+                // 说明：app.js 已在页面加载时运行过初始化逻辑
+                // 这里验证：当前 todos 与 localStorage 保存的内容是一致的
+                // （说明初始化时确实读取了 localStorage）
+                resetState([{ text: "验证同步", done: false }]);
+                const saved = JSON.parse(localStorage.getItem("todos"));
+                assertEqual(saved.length, todos.length, "初始化后 todos 与 localStorage 同步");
+                assertEqual(saved[0].text, todos[0].text, "内容一致");
+            }],
+        ]);
+
+        // ==========================================
+        // 把测试结果渲染到页面
+        // ==========================================
+
+        /**
+         * 统计通过/失败数量
+         */
+        let totalPass = 0;
+        let totalFail = 0;
+        for (const suite of allSuites) {
+            for (const r of suite.results) {
+                if (r.pass) {
+                    totalPass++;
+                } else {
+                    totalFail++;
+                }
+            }
+        }
+
+        const total = totalPass + totalFail;
+
+        // 汇总条
+        const summaryEl = document.createElement("div");
+        summaryEl.className = "summary " + (totalFail === 0 ? "all-pass" : "has-fail");
+        summaryEl.textContent =
+            "测试完成：" + totalPass + " 通过 / " + totalFail + " 失败 / 共 " + total + " 项";
+        document.body.appendChild(summaryEl);
+
+        // 各套件结果
+        for (const suite of allSuites) {
+            const suiteEl = document.createElement("div");
+            suiteEl.className = "suite";
+
+            const h3 = document.createElement("h3");
+            const suitePass = suite.results.filter(r => r.pass).length;
+            h3.textContent = suite.suiteName + "（" + suitePass + "/" + suite.results.length + "）";
+            suiteEl.appendChild(h3);
+
+            for (const result of suite.results) {
+                const caseEl = document.createElement("div");
+                caseEl.className = "test-case " + (result.pass ? "pass" : "fail");
+
+                const icon = result.pass ? "✓" : "✗";
+                const nameEl = document.createElement("span");
+                nameEl.textContent = icon + "  " + result.name;
+                caseEl.appendChild(nameEl);
+
+                // 失败时显示错误信息
+                if (!result.pass) {
+                    const errEl = document.createElement("span");
+                    errEl.className = "error-msg";
+                    errEl.textContent = "错误：" + result.error;
+                    caseEl.appendChild(errEl);
+                }
+
+                suiteEl.appendChild(caseEl);
+            }
+
+            document.body.appendChild(suiteEl);
+        }
+    </script>
+</body>
+</html>
