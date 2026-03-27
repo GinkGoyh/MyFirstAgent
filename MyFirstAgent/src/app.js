@@ -79,7 +79,8 @@ const renderTodos = () => {
     }
 
     // 根据搜索关键词过滤，只显示包含关键词的项（不修改原数组）
-    const visibleTodos = todos.filter((item) => item.text.includes(searchKeyword));
+    // toLowerCase() 把字符串转成小写，两边都转后比较，就能忽略大小写
+    const visibleTodos = todos.filter((item) => item.text.toLowerCase().includes(searchKeyword.toLowerCase()));
 
     // 过滤后没有匹配项，显示提示
     if (visibleTodos.length === 0) {
