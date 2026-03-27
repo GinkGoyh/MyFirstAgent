@@ -144,6 +144,88 @@ button:hover {
         padding: 30px;
         font-size: 15px;
       }
+/* ===== 暗黑模式切换按钮：固定在右上角 ===== */
+.theme-toggle-btn {
+    position: fixed;
+    top: 16px;
+    right: 20px;
+    background-color: #f0f0f0;
+    color: #333;
+    border: 1px solid #ccc;
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    font-size: 20px;
+    padding: 0;
+    cursor: pointer;
+    z-index: 999;
+    margin: 0;
+}
+
+.theme-toggle-btn:hover {
+    background-color: #e0e0e0;
+}
+
+/* ===== 暗黑模式：body 加上 dark 类后，下面所有样式生效 ===== */
+body.dark {
+    background-color: #1a1a2e;
+    color: #e0e0e0;
+}
+
+body.dark h1 {
+    color: #90caf9;
+}
+
+body.dark h2 {
+    color: #e0e0e0;
+    border-bottom-color: #90caf9;
+}
+
+body.dark .intro {
+    color: #aaa;
+}
+
+/* 暗黑模式下输入框 */
+body.dark input {
+    background-color: #2a2a3e;
+    color: #e0e0e0;
+    border-color: #555;
+}
+
+/* 暗黑模式下每条待办项 */
+body.dark .todo-item {
+    background-color: #2a2a3e;
+    border-color: #444;
+}
+
+/* 暗黑模式下已完成文字 */
+body.dark .todo-done {
+    color: #777;
+}
+
+/* 暗黑模式下统计和空提示文字 */
+body.dark .stats,
+body.dark .empty-tip {
+    color: #aaa;
+}
+
+/* 暗黑模式下引用名言 */
+body.dark .quote {
+    color: #aaa;
+    border-left-color: #66bb6a;
+}
+
+/* 暗黑模式下切换按钮本身 */
+body.dark .theme-toggle-btn {
+    background-color: #2a2a3e;
+    color: #e0e0e0;
+    border-color: #555;
+}
+
+body.dark .theme-toggle-btn:hover {
+    background-color: #3a3a5e;
+}
+
 .quote {
     color: #666666;
     font-style: italic;
